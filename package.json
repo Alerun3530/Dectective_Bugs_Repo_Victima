@@ -1,0 +1,13 @@
+{
+  "name": "repo-victima",
+  "version": "1.0.0",
+  "description": "API chica de usuarios con bugs plantados para El Detective de Bugs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
