@@ -220,12 +220,15 @@
 <header>
   <h1>repo-victima — consola</h1>
   <p>Panel manual para navegar los usuarios de prueba y disparar los 3 bugs plantados, sin usar curl.</p>
+  <p style="margin-top: 10px;"><a href="/historial.html" style="color: #2dd4bf; font-size: 13px; text-decoration: none;">Ver historial de incidentes del agente →</a></p>
 </header>
 
 <main>
   <section>
     <h2>Usuarios</h2>
     <button class="refrescar" onclick="cargarUsuarios()">Actualizar lista</button>
+    <button class="refrescar" onclick="resetearDatos()" style="border-color: #f2a93b; color: #f2a93b;">Restaurar datos</button>
+    <button class="refrescar" onclick="resetearCodigo()" style="border-color: #e5484d; color: #e5484d;">Restaurar código (bugs)</button>
     <div id="lista-usuarios">Cargando…</div>
   </section>
 
@@ -263,6 +266,41 @@
 </main>
 
 <script>
+  let CONFIG = { n8nWebhookUrl: null, supabaseUrl: null, supabaseKey: null };
+
+  async function cargarConfig() {
+    try {
+      const res = await fetch('/api/config');
+      CONFIG = await res.json();
+    } catch (e) {
+      console.warn('No se pudo cargar /api/config:', e.message);
+    }
+  }
+
+  async function notificarN8n(datosError, endpoint, severity) {
+    if (!CONFIG.n8nWebhookUrl) {
+      console.warn('N8N_WEBHOOK_URL no configurado en el .env — no se avisó a n8n.');
+      return { avisado: false, motivo: 'sin N8N_WEBHOOK_URL configurado' };
+    }
+    const payload = {
+      error_id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      stack_trace: datosError.stack || datosError.error || JSON.stringify(datosError),
+      endpoint: endpoint,
+      severity: severity,
+    };
+    try {
+      await fetch(CONFIG.n8nWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      return { avisado: true };
+    } catch (e) {
+      return { avisado: false, motivo: e.message };
+    }
+  }
+
   async function cargarUsuarios() {
     const contenedor = document.getElementById('lista-usuarios');
     contenedor.textContent = 'Cargando…';
@@ -300,9 +338,18 @@
   async function dispararBug1(boton) {
     boton.disabled = true;
     try {
-      const res = await fetch('/api/usuarios/2/es-mayor-de-edad');
+      const endpoint = '/api/usuarios/2/es-mayor-de-edad';
+      const res = await fetch(endpoint);
       const datos = await res.json();
-      mostrarSalida(JSON.stringify(datos, null, 2), res.ok ? 'ok' : 'error');
+
+      let salida = JSON.stringify(datos, null, 2);
+      if (!res.ok) {
+        const n8n = await notificarN8n(datos, endpoint, 'low');
+        salida += n8n.avisado
+          ? '\n\n✓ Aviso enviado a n8n.'
+          : `\n\n⚠ No se pudo avisar a n8n (${n8n.motivo}).`;
+      }
+      mostrarSalida(salida, res.ok ? 'ok' : 'error');
       cargarUsuarios();
     } catch (e) {
       mostrarSalida('Error de red: ' + e.message, 'error');
@@ -314,13 +361,22 @@
   async function dispararBug2(boton) {
     boton.disabled = true;
     try {
-      const res = await fetch('/api/usuarios', {
+      const endpoint = '/api/usuarios';
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ edad: 25 })
       });
       const datos = await res.json();
-      mostrarSalida(JSON.stringify(datos, null, 2), res.ok ? 'ok' : 'error');
+
+      let salida = JSON.stringify(datos, null, 2);
+      if (!res.ok) {
+        const n8n = await notificarN8n(datos, endpoint, 'low');
+        salida += n8n.avisado
+          ? '\n\n✓ Aviso enviado a n8n.'
+          : `\n\n⚠ No se pudo avisar a n8n (${n8n.motivo}).`;
+      }
+      mostrarSalida(salida, res.ok ? 'ok' : 'error');
     } catch (e) {
       mostrarSalida('Error de red: ' + e.message, 'error');
     } finally {
@@ -342,6 +398,35 @@
     }
   }
 
+  async function resetearDatos() {
+    try {
+      const res = await fetch('/api/reset/datos', { method: 'POST' });
+      const datos = await res.json();
+      mostrarSalida(JSON.stringify(datos, null, 2), 'ok');
+      cargarUsuarios();
+    } catch (e) {
+      mostrarSalida('Error de red: ' + e.message, 'error');
+    }
+  }
+
+  async function resetearCodigo() {
+    if (!confirm('Esto va a pisar cualquier fix que el agente haya aplicado y restaurar los 3 bugs originales. ¿Seguir?')) {
+      return;
+    }
+    try {
+      const res = await fetch('/api/reset/codigo', { method: 'POST' });
+      const datos = await res.json();
+      mostrarSalida(JSON.stringify(datos, null, 2), datos.ok ? 'riesgo' : 'error');
+      if (datos.requiere_reinicio) {
+        alert('Código restaurado. Si corriste el server con "npm run dev" (nodemon), ya se está reiniciando solo. Si usaste "npm start", reiniciá a mano (Ctrl+C y npm start de nuevo).');
+      }
+      cargarUsuarios();
+    } catch (e) {
+      mostrarSalida('Error de red: ' + e.message, 'error');
+    }
+  }
+
+  cargarConfig();
   cargarUsuarios();
 </script>
 
