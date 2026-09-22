@@ -6,210 +6,44 @@
 <title>repo-victima — consola</title>
 <style>
   :root {
-    --bg: #14171c;
-    --panel: #1b1f26;
-    --panel-border: #2a2f38;
-    --text: #e7e9ec;
-    --text-dim: #8b93a1;
-    --teal: #2dd4bf;
-    --amber: #f2a93b;
-    --red: #e5484d;
-    --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
-    --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --bg: #14171c; --panel: #1b1f26; --panel-border: #2a2f38;
+    --text: #e7e9ec; --text-dim: #8b93a1;
+    --teal: #2dd4bf; --amber: #f2a93b; --red: #e5484d;
+    --mono: ui-monospace, "SF Mono", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   }
-
   * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-  }
-
-  header {
-    padding: 28px 32px 20px;
-    border-bottom: 1px solid var(--panel-border);
-  }
-
-  header h1 {
-    margin: 0 0 6px;
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-
-  header p {
-    margin: 0;
-    color: var(--text-dim);
-    font-size: 14px;
-    max-width: 60ch;
-  }
-
-  main {
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 24px;
-    padding: 24px 32px 40px;
-  }
-
-  @media (max-width: 820px) {
-    main { grid-template-columns: 1fr; }
-  }
-
-  section h2 {
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: none;
-    color: var(--text-dim);
-    margin: 0 0 12px;
-  }
-
-  .usuario-card {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-  }
-
-  .usuario-card .fila-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 6px;
-  }
-
-  .usuario-card .nombre {
-    font-weight: 600;
-    font-size: 15px;
-  }
-
-  .usuario-card .id {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-
-  .usuario-card .meta {
-    font-size: 13px;
-    color: var(--text-dim);
-    display: flex;
-    gap: 14px;
-  }
-
-  .usuario-card .meta strong {
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .usuario-card.destacado {
-    border-color: var(--amber);
-  }
-
-  .usuario-card .etiqueta-riesgo {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 11px;
-    color: var(--amber);
-    border: 1px solid var(--amber);
-    border-radius: 4px;
-    padding: 1px 6px;
-  }
-
-  .refrescar {
-    background: none;
-    border: 1px solid var(--panel-border);
-    color: var(--text-dim);
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-bottom: 12px;
-  }
-
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+  header { padding: 28px 32px 20px; border-bottom: 1px solid var(--panel-border); }
+  header h1 { margin: 0 0 6px; font-size: 20px; font-weight: 600; }
+  header p { margin: 0; color: var(--text-dim); font-size: 14px; max-width: 60ch; }
+  main { display: grid; grid-template-columns: 340px 1fr; gap: 24px; padding: 24px 32px 40px; }
+  @media (max-width: 820px) { main { grid-template-columns: 1fr; } }
+  section h2 { font-size: 13px; font-weight: 600; color: var(--text-dim); margin: 0 0 12px; }
+  .usuario-card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+  .usuario-card .fila-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .usuario-card .nombre { font-weight: 600; font-size: 15px; }
+  .usuario-card .id { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+  .usuario-card .meta { font-size: 13px; color: var(--text-dim); display: flex; gap: 14px; }
+  .usuario-card .meta strong { color: var(--text); font-weight: 500; }
+  .usuario-card.destacado { border-color: var(--amber); }
+  .usuario-card .etiqueta-riesgo { display: inline-block; margin-top: 8px; font-size: 11px; color: var(--amber); border: 1px solid var(--amber); border-radius: 4px; padding: 1px 6px; }
+  .refrescar { background: none; border: 1px solid var(--panel-border); color: var(--text-dim); font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer; margin: 0 6px 12px 0; }
   .refrescar:hover { color: var(--text); border-color: var(--text-dim); }
-
-  .consola {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 20px;
-  }
-
-  .bug-fila {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--panel-border);
-  }
-
+  .consola { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px; padding: 20px; }
+  .bug-fila { display: flex; align-items: flex-start; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--panel-border); }
   .bug-fila:last-child { border-bottom: none; }
-
   .bug-info { flex: 1; }
-
-  .bug-info .titulo {
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 3px;
-  }
-
-  .bug-info .desc {
-    font-size: 13px;
-    color: var(--text-dim);
-    max-width: 46ch;
-  }
-
-  .gravedad {
-    font-size: 11px;
-    padding: 1px 7px;
-    border-radius: 4px;
-    margin-left: 8px;
-    vertical-align: middle;
-  }
-
+  .bug-info .titulo { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+  .bug-info .desc { font-size: 13px; color: var(--text-dim); max-width: 46ch; }
+  .gravedad { font-size: 11px; padding: 1px 7px; border-radius: 4px; margin-left: 8px; }
   .gravedad.bajo { color: var(--teal); border: 1px solid var(--teal); }
   .gravedad.alto { color: var(--amber); border: 1px solid var(--amber); }
-
-  button.disparar {
-    background: var(--teal);
-    color: #08211d;
-    border: none;
-    font-weight: 600;
-    font-size: 13px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
+  button.disparar { background: var(--teal); color: #08211d; border: none; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 6px; cursor: pointer; white-space: nowrap; }
   button.disparar:hover { filter: brightness(1.08); }
   button.disparar:disabled { opacity: 0.5; cursor: default; }
-
-  .salida {
-    margin-top: 18px;
-    background: #0f1216;
-    border: 1px solid var(--panel-border);
-    border-left-width: 3px;
-    border-radius: 6px;
-    padding: 14px 16px;
-    font-family: var(--mono);
-    font-size: 12.5px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
-    max-height: 320px;
-    overflow-y: auto;
-  }
-
-  .salida.vacia {
-    color: var(--text-dim);
-    font-family: var(--sans);
-    border-left-color: var(--panel-border);
-  }
-
+  .salida { margin-top: 18px; background: #0f1216; border: 1px solid var(--panel-border); border-left-width: 3px; border-radius: 6px; padding: 14px 16px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; max-height: 320px; overflow-y: auto; }
+  .salida.vacia { color: var(--text-dim); font-family: var(--sans); border-left-color: var(--panel-border); }
   .salida.ok { border-left-color: var(--teal); }
   .salida.riesgo { border-left-color: var(--amber); }
   .salida.error { border-left-color: var(--red); }
@@ -239,7 +73,7 @@
       <div class="bug-fila">
         <div class="bug-info">
           <div class="titulo">Bug 1 — Chequeo de mayoría de edad<span class="gravedad bajo">bajo riesgo</span></div>
-          <div class="desc">Usa "=" en vez de ">=". Se prueba contra Luis Pérez (id 2, 17 años).</div>
+          <div class="desc">ReferenceError por typo. Se prueba contra Luis Pérez (id 2, 17 años).</div>
         </div>
         <button class="disparar" onclick="dispararBug1(this)">Disparar</button>
       </div>
@@ -255,7 +89,7 @@
       <div class="bug-fila">
         <div class="bug-info">
           <div class="titulo">Bug 3 — Nivel de cliente<span class="gravedad alto">alto riesgo</span></div>
-          <div class="desc">No tira error. Se detecta con el monitor de anomalías, que chequea el patrón "10+ compras y menor de edad" sin revisar logs.</div>
+          <div class="desc">No tira error. Se detecta con el monitor de anomalías (Sofía, id 5).</div>
         </div>
         <button class="disparar" onclick="dispararBug3(this)">Consultar monitor</button>
       </div>
@@ -278,28 +112,47 @@
   }
 
   async function notificarN8n(datosError, endpoint, severity) {
-    if (!CONFIG.n8nWebhookUrl) {
-      console.warn('N8N_WEBHOOK_URL no configurado en el .env — no se avisó a n8n.');
-      return { avisado: false, motivo: 'sin N8N_WEBHOOK_URL configurado' };
+  const payload = {
+    error_id: crypto.randomUUID(),
+    timestamp: new Date().toISOString(),
+    stack_trace:
+      datosError.stack ||
+      datosError.error ||
+      JSON.stringify(datosError),
+    endpoint: endpoint,
+    severity: severity
+  };
+
+  try {
+    const res = await fetch("/api/error-critico", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const respuesta = await res.json();
+
+    if (!res.ok) {
+      return {
+        avisado: false,
+        motivo: respuesta.error || "Error al enviar el aviso a n8n"
+      };
     }
-    const payload = {
-      error_id: crypto.randomUUID(),
-      timestamp: new Date().toISOString(),
-      stack_trace: datosError.stack || datosError.error || JSON.stringify(datosError),
-      endpoint: endpoint,
-      severity: severity,
+
+    return {
+      avisado: true,
+      respuesta: respuesta
     };
-    try {
-      await fetch(CONFIG.n8nWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      return { avisado: true };
-    } catch (e) {
-      return { avisado: false, motivo: e.message };
-    }
+
+  } catch (e) {
+    return {
+      avisado: false,
+      motivo: e.message
+    };
   }
+}
 
   async function cargarUsuarios() {
     const contenedor = document.getElementById('lista-usuarios');
@@ -325,9 +178,7 @@
     }
   }
 
-  function esCasoBug3(u) {
-    return u.compras >= 10 && u.edad < 18;
-  }
+  function esCasoBug3(u) { return u.compras >= 10 && u.edad < 18; }
 
   function mostrarSalida(texto, tipo) {
     const salida = document.getElementById('salida');
@@ -341,13 +192,10 @@
       const endpoint = '/api/usuarios/2/es-mayor-de-edad';
       const res = await fetch(endpoint);
       const datos = await res.json();
-
       let salida = JSON.stringify(datos, null, 2);
       if (!res.ok) {
         const n8n = await notificarN8n(datos, endpoint, 'low');
-        salida += n8n.avisado
-          ? '\n\n✓ Aviso enviado a n8n.'
-          : `\n\n⚠ No se pudo avisar a n8n (${n8n.motivo}).`;
+        salida += n8n.avisado ? '\n\n✓ Aviso enviado a n8n.' : `\n\n⚠ No se pudo avisar a n8n (${n8n.motivo}).`;
       }
       mostrarSalida(salida, res.ok ? 'ok' : 'error');
       cargarUsuarios();
@@ -368,13 +216,10 @@
         body: JSON.stringify({ edad: 25 })
       });
       const datos = await res.json();
-
       let salida = JSON.stringify(datos, null, 2);
       if (!res.ok) {
         const n8n = await notificarN8n(datos, endpoint, 'low');
-        salida += n8n.avisado
-          ? '\n\n✓ Aviso enviado a n8n.'
-          : `\n\n⚠ No se pudo avisar a n8n (${n8n.motivo}).`;
+        salida += n8n.avisado ? '\n\n✓ Aviso enviado a n8n.' : `\n\n⚠ No se pudo avisar a n8n (${n8n.motivo}).`;
       }
       mostrarSalida(salida, res.ok ? 'ok' : 'error');
     } catch (e) {
@@ -385,18 +230,45 @@
   }
 
   async function dispararBug3(boton) {
-    boton.disabled = true;
-    try {
-      const res = await fetch('/api/monitoreo/anomalias');
-      const datos = await res.json();
-      const tipo = datos.anomalias_detectadas > 0 ? 'riesgo' : 'ok';
-      mostrarSalida(JSON.stringify(datos, null, 2), res.ok ? tipo : 'error');
-    } catch (e) {
-      mostrarSalida('Error de red: ' + e.message, 'error');
-    } finally {
-      boton.disabled = false;
+  boton.disabled = true;
+
+  try {
+    // Primero activamos manualmente el escenario del Bug 3.
+    const activar = await fetch('/api/monitoreo/activar-bug3', {
+      method: 'POST'
+    });
+
+    const activacion = await activar.json();
+
+    if (!activar.ok) {
+      throw new Error(
+        activacion.error || 'No se pudo activar Bug 3'
+      );
     }
+
+    // Ahora consultamos el monitor.
+    const res = await fetch('/api/monitoreo/anomalias');
+    const datos = await res.json();
+
+    const tipo =
+      datos.anomalias_detectadas > 0
+        ? 'riesgo'
+        : 'ok';
+
+    mostrarSalida(
+      JSON.stringify(datos, null, 2),
+      res.ok ? tipo : 'error'
+    );
+
+  } catch (e) {
+    mostrarSalida(
+      'Error de red: ' + e.message,
+      'error'
+    );
+  } finally {
+    boton.disabled = false;
   }
+}
 
   async function resetearDatos() {
     try {
@@ -410,16 +282,11 @@
   }
 
   async function resetearCodigo() {
-    if (!confirm('Esto va a pisar cualquier fix que el agente haya aplicado y restaurar los 3 bugs originales. ¿Seguir?')) {
-      return;
-    }
+    if (!confirm('Esto va a pisar cualquier fix que el agente haya aplicado y restaurar los 3 bugs originales. ¿Seguir?')) return;
     try {
       const res = await fetch('/api/reset/codigo', { method: 'POST' });
       const datos = await res.json();
       mostrarSalida(JSON.stringify(datos, null, 2), datos.ok ? 'riesgo' : 'error');
-      if (datos.requiere_reinicio) {
-        alert('Código restaurado. Si corriste el server con "npm run dev" (nodemon), ya se está reiniciando solo. Si usaste "npm start", reiniciá a mano (Ctrl+C y npm start de nuevo).');
-      }
       cargarUsuarios();
     } catch (e) {
       mostrarSalida('Error de red: ' + e.message, 'error');

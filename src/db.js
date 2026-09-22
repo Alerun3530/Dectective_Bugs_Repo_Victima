@@ -1,17 +1,24 @@
 // Base de datos en memoria — simple a propósito, no es el foco del proyecto.
-// Se reinicia cada vez que arranca el servidor.
 
-const usuarios = [
-  { id: 1, nombre: "Ana Torres", email: "ana@example.com", edad: 29, compras: 7, descuentoAplicado: false },
-  { id: 2, nombre: "Luis Pérez", email: "luis@example.com", edad: 17, compras: 2, descuentoAplicado: false },
-  { id: 3, nombre: "Marta Gómez", email: "marta@example.com", edad: 41, compras: 12, descuentoAplicado: false },
-  { id: 4, nombre: "Carlos Ruiz", email: "carlos@example.com", edad: 22, compras: 0, descuentoAplicado: false },
-  // Usuario precargado a propósito para disparar el Bug 3 (lógica de negocio
-  // ambigua) sin pasos extra: 10+ compras pero menor de edad.
-  { id: 5, nombre: "Sofía Ramos", email: "sofia@example.com", edad: 16, compras: 14, descuentoAplicado: false },
-];
+function usuariosDeFabrica() {
+  return [
+    { id: 1, nombre: "Ana Torres", email: "ana@example.com", edad: 29, compras: 7, descuentoAplicado: false },
+    { id: 2, nombre: "Luis Pérez", email: "luis@example.com", edad: 17, compras: 2, descuentoAplicado: false },
+    { id: 3, nombre: "Marta Gómez", email: "marta@example.com", edad: 41, compras: 12, descuentoAplicado: false },
+    { id: 4, nombre: "Carlos Ruiz", email: "carlos@example.com", edad: 22, compras: 0, descuentoAplicado: false },
+    // Precargado a propósito para disparar el Bug 3 sin pasos extra:
+    // 10+ compras pero menor de edad.
+    { id: 5, nombre: "Sofía Ramos", email: "sofia@example.com", edad: 16, compras: 14, descuentoAplicado: false },
+  ];
+}
 
+let usuarios = usuariosDeFabrica();
 let nextId = 6;
+
+function resetearDatos() {
+  usuarios = usuariosDeFabrica();
+  nextId = 6;
+}
 
 function getUsuarios() {
   return usuarios;
@@ -34,4 +41,4 @@ function crearUsuario(datos) {
   return nuevo;
 }
 
-module.exports = { usuarios, getUsuarios, getUsuarioPorId, crearUsuario };
+module.exports = { usuarios, getUsuarios, getUsuarioPorId, crearUsuario, resetearDatos };

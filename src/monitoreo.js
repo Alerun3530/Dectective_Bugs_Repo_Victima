@@ -1,32 +1,93 @@
 const express = require("express");
+
 const router = express.Router();
+
 const { getUsuarios } = require("./db");
 
-// GET /api/monitoreo/anomalias — monitor liviano de reglas de negocio
-//
-// No lee logs ni depende de una excepción: chequea patrones conocidos que
-// "no deberían pasar" según la regla de negocio esperada, y devuelve una
-// alerta puntual si encuentra algún caso. Es el equivalente simulado a un
-// analista notando un número raro en un dashboard, o un chequeo de calidad
-// de datos corriendo cada tanto (un cron liviano, no una auditoría de logs).
-//
-// Así es como se detecta el Bug 3 (lógica de negocio ambigua): no tira 500,
-// pero sí genera una señal puntual y acotada que el simulador (Módulo 2)
-// puede convertir directamente en un webhook hacia n8n, sin que el agente
-// tenga que inspeccionar nada manualmente para enterarse de que hay un
-// caso a diagnosticar.
-router.get("/anomalias", (req, res) => {
-  const alertas = getUsuarios()
-    .filter((u) => u.compras >= 10 && u.edad < 18)
-    .map((u) => ({
-      tipo: "nivel_cliente_inconsistente",
-      usuario_id: u.id,
-      descripcion: `Usuario con ${u.compras} compras (alto valor) pero nivel forzado a "regular" por ser menor de edad. Revisar si la regla de negocio en /nivel-cliente es intencional.`,
-      endpoint_afectado: `/api/usuarios/${u.id}/nivel-cliente`,
-      severity: "medium",
-    }));
+// Bug 3 permanece desactivado hasta que el usuario
+// presione el botón "Consultar monitor".
+let bug3Activado = false;
 
-  res.json({ anomalias_detectadas: alertas.length, alertas });
+// Activar el escenario del Bug 3
+router.post("/activar-bug3", (req, res) => {
+  bug3Activado = true;
+
+  res.json({
+    ok: true,
+    mensaje: "Bug 3 activado."
+  });
+});
+
+// Endpoint que consulta n8n
+router.get("/anomalias", (req, res) => {
+
+  // Antes de presionar el botón no se reporta ninguna anomalía.
+  if (!bug3Activado) {
+    return res.json({
+      anomalias_detectadas: 0,
+      alertas: []
+    });
+  }
+
+  const usuarios = getUsuarios();
+  const alertas = [];
+
+  // Anomalía 2: Usuarios con edad inválida (negativa o > 120)
+  usuarios
+    .filter((u) => u.edad < 0 || u.edad > 120)
+    .forEach((u) => {
+      alertas.push({
+        tipo: "edad_invalida",
+        usuario_id: u.id,
+        descripcion: `Usuario con edad inválida: ${u.edad} años.`,
+        endpoint_afectado: `/api/usuarios/${u.id}`,
+        severity: "high",
+      });
+    });
+
+  // Anomalía 3: Compras negativas
+  usuarios
+    .filter((u) => u.compras < 0)
+    .forEach((u) => {
+      alertas.push({
+        tipo: "compras_negativas",
+        usuario_id: u.id,
+        descripcion: `Usuario con compras negativas: ${u.compras}.`,
+        endpoint_afectado: `/api/usuarios/${u.id}`,
+        severity: "high",
+      });
+    });
+
+  // Anomalía 4: Usuarios sin email o email inválido
+  usuarios
+    .filter((u) => !u.email || !u.email.includes("@"))
+    .forEach((u) => {
+      alertas.push({
+        tipo: "email_invalido",
+        usuario_id: u.id,
+        descripcion: `Usuario con email inválido o faltante: "${u.email}".`,
+        endpoint_afectado: `/api/usuarios/${u.id}`,
+        severity: "medium",
+      });
+    });
+
+  // Anomalía 5: Usuarios VIP sin compras (inconsistencia de datos)
+  usuarios
+    .filter((u) => u.compras === 0 && u.edad >= 18) // Solo adultos, menores no pueden ser VIP
+    .forEach((u) => {
+      alertas.push({
+        tipo: "vip_sin_compras",
+        usuario_id: u.id,
+        descripcion: `Usuario adulto (${u.edad} años) con 0 compras. Verificar si nivel cliente es correcto.`,
+        endpoint_afectado: `/api/usuarios/${u.id}/nivel-cliente`,
+        severity: "low",
+      });
+    });
+
+  res.json({
+    anomalias_detectadas: alertas.length,
+    alertas
+  });
 });
 
 module.exports = router;

@@ -180,7 +180,7 @@
 
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/incidentes?select=id,content,metadata,created_at&order=created_at.desc&limit=50`,
+        `${SUPABASE_URL}/incidentes?select=id,content,metadata,created_at&order=created_at.desc&limit=50`,
         {
           headers: {
             apikey: SUPABASE_KEY,
