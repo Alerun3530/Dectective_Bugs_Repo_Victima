@@ -33,7 +33,7 @@ router.get("/:id/es-mayor-de-edad", (req, res) => {
   if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
 
   let esMayor = false;
-  if (usuarioo.edad >= 18) {
+  if (usuario.edad >= 18) {
     esMayor = true;
   }
 
